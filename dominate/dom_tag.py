@@ -85,8 +85,20 @@ class dom_tag(object):
                      # otherwise, text will be escaped() and whitespace may be
                      # modified
   is_inline = False
-
-
+  
+  _default_prefix_tuple = ('data_', 'aria_')
+  _prefix_tuple = self._default_prefix_tuple
+  
+  @property
+  def prefix_tuple(self):
+    return self._prefix_tuple
+  
+  def add_prefix_tuple_value(self, value):
+    self._prefix_tuple += (value,)
+  
+  def reset_prefix_tuple(self):
+    self._prefix_tuple = self._default_prefix_tuple
+    
   def __new__(_cls, *args, **kwargs):
     '''
     Check if bare tag is being used a a decorator
@@ -445,7 +457,7 @@ class dom_tag(object):
       attribute = attribute[1:]
 
     # Workaround for dash
-    special_prefix = any([attribute.startswith(x) for x in ('data_', 'aria_')])
+    special_prefix = any([attribute.startswith(x) for x in self.prefix_tuple])
     if attribute in set(['http_equiv']) or special_prefix:
       attribute = attribute.replace('_', '-').lower()
 
