@@ -87,17 +87,16 @@ class dom_tag(object):
   is_inline = False
   
   _default_prefix_tuple = ('data_', 'aria_')
-  _prefix_tuple = self._default_prefix_tuple
+  _prefix_tuple = _default_prefix_tuple
   
-  @property
-  def prefix_tuple(self):
-    return self._prefix_tuple
+  @classmethod
+  def add_prefix_tuple_value(klass, value):
+    klass._prefix_tuple += (value,)
   
-  def add_prefix_tuple_value(self, value):
-    self._prefix_tuple += (value,)
+  @classmethod
+  def reset_prefix_tuple(klass):
+    klass._prefix_tuple = klass._default_prefix_tuple
   
-  def reset_prefix_tuple(self):
-    self._prefix_tuple = self._default_prefix_tuple
     
   def __new__(_cls, *args, **kwargs):
     '''
@@ -146,6 +145,9 @@ class dom_tag(object):
     self._ctx = None
     self._add_to_ctx()
 
+  @property
+  def prefix_tuple(self):
+    return self.__class_._prefix_tuple
 
   # context manager
   frame = namedtuple('frame', ['tag', 'items', 'used'])
@@ -457,7 +459,7 @@ class dom_tag(object):
       attribute = attribute[1:]
 
     # Workaround for dash
-    special_prefix = any([attribute.startswith(x) for x in self.prefix_tuple])
+    special_prefix = any([attribute.startswith(x) for x in dom_tag._prefix_tuple])
     if attribute in set(['http_equiv']) or special_prefix:
       attribute = attribute.replace('_', '-').lower()
 
